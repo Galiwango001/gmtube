@@ -23,3 +23,20 @@ yarn-debug.log*
 yarn-error.log*
 
 .vercel
+
+# Virtual environment
+venv/
+env/
+
+# Django specific
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+
+# Local environment variables
+.env
+
+# VSCode settings
+.vscode/
