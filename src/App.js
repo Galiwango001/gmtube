@@ -17,7 +17,8 @@ function App() {
     setError(null);
     setLoading(true);
     try {
-      const response = await axios.get('http://192.168.48.89:8000/api/serve_video_info/', {
+      // Update the URL to point to your PythonAnywhere backend
+      const response = await axios.get('https://medi001.pythonanywhere.com/api/serve_video_info/', {
         params: { url: videoUrl }
       });
       if (response && response.data) {
@@ -37,7 +38,7 @@ function App() {
     try {
       alert(`Downloading ${type === 'video' ? 'video' : 'audio'}: ${videoInfo.title}`);
   
-      const response = await axios.get('http://192.168.48.89:8000/api/download_video/', {
+      const response = await axios.get('https://medi001.pythonanywhere.com/api/download_video/', {
         params: { url: videoUrl, itag, type },
         responseType: 'blob', // Important for file download
         onDownloadProgress: (progressEvent) => {
