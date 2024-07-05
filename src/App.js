@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './App.css'; // Import the CSS file
+import './App.css';
 import { formatBytes, formatDuration } from './utils';
-import { instructionsText, instructionsSteps, featuresList, privacyText, termsText, legalText } from './texts'; // Import your text content
+import { instructionsText, instructionsSteps, featuresList, privacyText, termsText, legalText } from './texts';
 
 function App() {
   const [videoUrl, setVideoUrl] = useState('');
@@ -39,9 +39,8 @@ function App() {
   
       const response = await axios.get('https://medimenz.pythonanywhere.com/api/download_video/', {
         params: { url: videoUrl, itag, type },
-        responseType: 'blob', // Important for file download
+        responseType: 'blob',
         onDownloadProgress: (progressEvent) => {
-          // Display download progress using browser's native download icon
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           console.log(`Download Progress: ${percentCompleted}%`);
         }
@@ -51,7 +50,7 @@ function App() {
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = `${videoInfo.title}.${type === 'video' ? 'mp4' : 'mp3'}`; // Include title in download filename
+      a.download = `${videoInfo.title}.${type === 'video' ? 'mp4' : 'mp3'}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -59,7 +58,7 @@ function App() {
       setError(error.response ? error.response.data.error : 'An error occurred during download');
     }
   };
-  
+
   const renderQualitySection = () => {
     if (!videoInfo) return null;
 
@@ -119,78 +118,63 @@ function App() {
         alertText = legalText;
         break;
       default:
-        alertText = 'Text not available';
+        break;
     }
-    alert(alertText);
+    alert(alertText); // You can customize this handling as needed
   };
 
   return (
     <div className="App">
-      <h1>GMTUBE free online YouTube audio and video downloader</h1>
-      
-      <form onSubmit={handleSubmit} className="search-form">
-        <input
-          type="text"
-          placeholder="Enter YouTube Video URL"
-          value={videoUrl}
-          onChange={(e) => setVideoUrl(e.target.value)}
-          className="search-input"
-        />
-        <button type="submit" className="search-button">Search</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {loading && <div className="loading-dots"><span></span><span></span><span></span></div>}
-      <div className="row">
-        <div className="left-column">
+      <header className="App-header">
+        <h1>YouTube Downloader</h1>
+        <form onSubmit={handleSubmit} className="video-form">
+          <input
+            type="text"
+            placeholder="Enter YouTube URL"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+          />
+          <button type="submit" disabled={loading}>{loading ? 'Loading...' : 'Get Video Info'}</button>
+        </form>
+        {error && <div className="error">{error}</div>}
+        {videoInfo && (
           <div className="video-info">
-            {videoInfo && (
-              <>
-                <h2>{videoInfo.title}</h2>
+            <h2>{videoInfo.title}</h2>
+            <div className="info-row">
+              <img src={videoInfo.thumbnail_url} alt="Video Thumbnail" />
+              <div className="info-details">
                 <p>Duration: {videoDuration}</p>
-                <img src={videoInfo.thumbnail_url} alt="Thumbnail" className="thumbnail" />
-              </>
-            )}
+                <p>Available Streams: {videoInfo.video_streams.length + videoInfo.audio_streams.length}</p>
+              </div>
+            </div>
+            <div className="tabs">
+              <button className={activeTab === 'video' ? 'active' : ''} onClick={() => setActiveTab('video')}>Video</button>
+              <button className={activeTab === 'audio' ? 'active' : ''} onClick={() => setActiveTab('audio')}>Audio</button>
+            </div>
+            {renderQualitySection()}
           </div>
-        </div>
-        <div className="right-column">
-          <div className="tabs">
-            {videoInfo && (
-              <>
-                <button onClick={() => setActiveTab('video')} className={activeTab === 'video' ? 'tab active' : 'tab'}>Video</button>
-                <button onClick={() => setActiveTab('audio')} className={activeTab === 'audio' ? 'tab active' : 'tab'}>Audio</button>
-              </>
-            )}
-          </div>
-          {renderQualitySection()}
-        </div>
-      </div>
-      <h1>YouTube Video Search</h1>
-      <p>{instructionsText}</p>
-      <div className="instructions-features">
-        <div className="instructions">
-          <h2>Instructions</h2>
+        )}
+        <div className="footer">
+          <h3>Instructions</h3>
+          <p>{instructionsText}</p>
           <ul>
             {instructionsSteps.map((step, index) => (
               <li key={index}>{step}</li>
             ))}
           </ul>
-        </div>
-        <div className="features">
-          <h2>Features</h2>
+          <h3>Features</h3>
           <ul>
             {featuresList.map((feature, index) => (
               <li key={index}>{feature}</li>
             ))}
           </ul>
+          <div className="legal-links">
+            <a href="#" onClick={(e) => handleLinkClick('privacy', e)}>Privacy Policy</a>
+            <a href="#" onClick={(e) => handleLinkClick('terms', e)}>Terms of Use</a>
+            <a href="#" onClick={(e) => handleLinkClick('legal', e)}>Legal Disclaimer</a>
+          </div>
         </div>
-      </div>
-      <h6>@2024 GMTUBE</h6>
-      <footer className="footer">
-        
-        <a href="#" onClick={(e) => handleLinkClick('privacy', e)}>Privacy Policy</a>
-        <a href="#" onClick={(e) => handleLinkClick('terms', e)}>Terms of Use</a>
-        <a href="#" onClick={(e) => handleLinkClick('legal', e)}>Legal Disclaimer</a>
-      </footer>
+      </header>
     </div>
   );
 }
